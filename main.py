@@ -6,15 +6,13 @@ import time
 
 
 class Github:
-    def __init__(self, username, password, flag = True,followers = [],following = []):
+    def __init__(self, username, password, flag=True, followers=[], following=[]):
         self.browser = webdriver.Chrome()
         self.username = username
         self.password = password
         self.flag = flag
         self.followers = followers
         self.following = following
-
-
 
     def signIn(self):
 
@@ -55,7 +53,6 @@ class Github:
             except selenium.common.exceptions.NoSuchElementException:
                 print("Your followers count not updated plz try again later..")
                 self.flag = False
-
 
     def getFollowing(self):
         time.sleep(3)
