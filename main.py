@@ -2,18 +2,15 @@ from userInfo import username, password
 from selenium import webdriver
 import selenium
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 import time
 
 
 class Github:
-    def __init__(self, username, password, flag=True, followers=[], following=[]):
+    def __init__(self, username, password, flag = True):
         self.browser = webdriver.Chrome()
         self.username = username
         self.password = password
         self.flag = flag
-        self.followers = followers
-        self.following = following
 
     def signIn(self):
 
@@ -41,6 +38,7 @@ class Github:
         # getting follower count so we can run loop that much
         followerCount = self.browser.find_element_by_xpath(
             '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[4]/div[2]/div[3]/div/a[1]/span').text
+        followers = []
         followerCount = int(followerCount)
 
         # getting our followers name
@@ -50,10 +48,16 @@ class Github:
                     '//*[@id="js-pjax-container"]/div[2]/div/div[2]/div[2]/div/div[' + str(
                         i) + ']/div[2]/a/span[2]').text
                 # appending to our empty follower list
-                self.followers.append(followerName + "\n")
+                followers.append(followerName + "\n")
             except selenium.common.exceptions.NoSuchElementException:
                 print("Your followers count not updated plz try again later..")
                 self.flag = False
+
+        # creating text file to write our follower list
+        document = open('followers.txt', 'w+')
+        for i in followers:
+            # writing to file
+            document.write(i)
 
     def getFollowing(self):
         time.sleep(3)
@@ -63,6 +67,7 @@ class Github:
         # getting following count so we can run loop that much
         followingCount = self.browser.find_element_by_xpath(
             '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[4]/div[2]/div[3]/div/a[2]/span').text
+        following = []
         followingCount = int(followingCount)
 
         # getting our followings name
@@ -72,38 +77,49 @@ class Github:
                     '//*[@id="js-pjax-container"]/div[2]/div/div[2]/div[2]/div/div[' + str(
                         i) + ']/div[2]/a/span[2]').text
                 # appending to our empty following list
-                self.following.append(followingName + "\n")
+                following.append(followingName + "\n")
             except selenium.common.exceptions.NoSuchElementException:
                 print("Your following count not updated plz try again later..")
                 self.flag = False
+
+        # creating text file to write our following list
+        document = open('following.txt', 'w+')
+        for i in following:
+            # writing to file
+            document.write(i)
 
     def unfollow(self):
         self.getFollowers()
         self.getFollowing()
 
         if self.flag:
+            # opening our text files
+            followersTxt = open('followers.txt')
+            followingTxt = open('following.txt')
+
+            followers = []
+            following = []
             notFollowing = []
 
-            for i in self.following:
-                if i not in self.followers:
+            for i in followersTxt:
+                followers.append(i)
+
+            for i in followingTxt:
+                following.append(i)
+
+            for i in following:
+                if i not in followers:
                     notFollowing.append(i)
 
             if notFollowing != []:
                 for i in notFollowing:
                     self.browser.get('https://github.com/' + i.strip())
                     time.sleep(3)
-                    try:
-                        unfollowButton = self.browser.find_element_by_xpath(
-                            '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[3]/div[1]/div/div/span/form['
-                            '2]/input[2]')
-                        unfollowButton.click()
-                        time.sleep(3)
-                    except NoSuchElementException:
-                        unfollowButton = self.browser.find_element_by_xpath(
-                            '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[4]/div[1]/div/div/span/form['
-                            '2]/input[2]')
-                        unfollowButton.click()
-                        time.sleep(3)
+                    unfollowButton = self.browser.find_element_by_xpath(
+                        '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[3]/div[1]/div/div/span/form[2]/input['
+                        '2]')
+                    unfollowButton.click()
+                    time.sleep(3)
 
                 self.browser.close()
                 print("task completed!")
