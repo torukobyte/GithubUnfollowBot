@@ -2,6 +2,7 @@ from userInfo import username, password
 from selenium import webdriver
 import selenium
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 import time
 
 
@@ -91,11 +92,18 @@ class Github:
                 for i in notFollowing:
                     self.browser.get('https://github.com/' + i.strip())
                     time.sleep(3)
-                    unfollowButton = self.browser.find_element_by_xpath(
-                        '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[3]/div[1]/div/div/span/form[2]/input['
-                        '2]')
-                    unfollowButton.click()
-                    time.sleep(3)
+                    try:
+                        unfollowButton = self.browser.find_element_by_xpath(
+                            '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[3]/div[1]/div/div/span/form['
+                            '2]/input[2]')
+                        unfollowButton.click()
+                        time.sleep(3)
+                    except NoSuchElementException:
+                        unfollowButton = self.browser.find_element_by_xpath(
+                            '//*[@id="js-pjax-container"]/div[2]/div/div[1]/div/div[4]/div[1]/div/div/span/form['
+                            '2]/input[2]')
+                        unfollowButton.click()
+                        time.sleep(3)
 
                 self.browser.close()
                 print("task completed!")
