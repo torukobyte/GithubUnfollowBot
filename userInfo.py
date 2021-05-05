@@ -1,2 +1,2 @@
-username = "torukobyte"
-password = "Okskamdin7343."
+username = "username"
+password = "password"
